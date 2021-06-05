@@ -9,7 +9,7 @@ export default {
             required: true,
             type: String
         },
-        rotulo: {
+        titulo: {
             required: true,
             type: String
         },
