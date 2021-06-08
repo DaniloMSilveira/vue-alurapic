@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1 class="centralizado">{{ titulo }}</h1>
+    <p v-show="mensagem" class="centralizado">{{ mensagem }}</p>
     <input type="search" 
       class="filtro" 
       @input="filtro = $event.target.value" 
@@ -27,6 +28,7 @@ import Painel from '../shared/Painel/index.vue';
 import ImagemResponsiva from '../shared/ImagemResponsiva/index.vue';
 import Botao from '../shared/Botao/index.vue';
 import Transform from '../../directives/Transform';
+import FotoService from '../../domain/Foto/service';
 
 export default {
   components: {
@@ -45,7 +47,8 @@ export default {
 
       titulo: 'Alurapic', 
       fotos: [],
-      filtro: ''
+      filtro: '',
+      mensagem: ''
     }
   },
 
@@ -62,13 +65,21 @@ export default {
 
   methods: {
     remove(foto) {
-      alert('Remover a foto!' + foto.titulo);
+      this.service.apaga(foto._id)
+        .then(() => {
+          this.fotos.splice(this.fotos.indexOf(foto), 1);
+          this.mensagem = 'Foto removida com sucesso'
+        }, err => {
+          console.log(err);
+          this.mensagem = 'Não foi possível remover a foto';
+        }
+      );  
     }
   },
 
   created() {
-    this.$http.get('http://localhost:3000/v1/fotos')
-      .then(res => res.json())
+    this.service = new FotoService(this.$resource);
+    this.service.lista()
       .then(fotos => this.fotos = fotos, err => console.log(err));
   }
 }
